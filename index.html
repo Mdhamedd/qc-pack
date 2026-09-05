@@ -1,0 +1,2854 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#23486b" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Pack to Pack" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <title>Pack to Pack | نظام التفتيش ومراقبة الجودة</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+      :root {
+        --primary: #2f5d8c;
+        --primary-dark: #23486b;
+        --secondary: #607d8b;
+        --danger: #c95757;
+        --warning: #c58b35;
+        --success: #39856b;
+        --whatsapp: #218c55;
+        --bg: #eef2f3;
+        --card-bg: #ffffff;
+        --border: #d7e0e3;
+        --text: #263238;
+        --muted: #68777d;
+        --touch-target: 44px;
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        margin: 0;
+        padding: clamp(8px, 2vw, 16px);
+        direction: rtl;
+      }
+
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-dark),
+          var(--primary)
+        );
+        color: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .header-title h1 {
+        margin: 0;
+        font-size: 1.3rem;
+      }
+      .factory-name {
+        display: block;
+        margin-bottom: 2px;
+        color: #d9edf2;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+      }
+      .header-title small {
+        font-size: 0.85rem;
+        opacity: 0.9;
+      }
+
+      .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 100%;
+      }
+      @media (min-width: 600px) {
+        .btn-group {
+          width: auto;
+        }
+        .header-title h1 {
+          font-size: 1.5rem;
+        }
+      }
+
+      .btn {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.85rem;
+        transition: 0.2s;
+        flex: 1;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        min-height: var(--touch-target);
+        touch-action: manipulation;
+      }
+      .btn:hover {
+        opacity: 0.9;
+      }
+      .btn-whatsapp {
+        background-color: var(--whatsapp);
+      }
+      .btn-success {
+        background-color: var(--success);
+      }
+      .btn-secondary {
+        background-color: #7f8c8d;
+      }
+      .btn-danger {
+        background-color: var(--danger);
+      }
+      .btn-warning {
+        background-color: var(--warning);
+        color: #fff;
+      }
+      .btn-sm {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+        border-radius: 4px;
+        flex: none;
+        min-width: var(--touch-target);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .stat-card {
+        background: var(--card-bg);
+        padding: 12px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border-top: 4px solid var(--primary);
+      }
+      .stat-card .number {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: var(--primary);
+        margin: 3px 0;
+      }
+      .stat-card .label {
+        font-size: 0.75rem;
+        color: #666;
+      }
+
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      .main-grid > * {
+        min-width: 0;
+      }
+      @media (min-width: 992px) {
+        .main-grid {
+          grid-template-columns: 380px 1fr;
+        }
+      }
+
+      .card {
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        margin-bottom: 15px;
+        min-width: 0;
+      }
+
+      h2 {
+        color: var(--primary);
+        font-size: 1rem;
+        border-bottom: 2px solid var(--bg);
+        padding-bottom: 8px;
+        margin-top: 0;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      @media (max-width: 480px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .form-group {
+        margin-bottom: 10px;
+      }
+      label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        min-height: var(--touch-target);
+        touch-action: manipulation;
+      }
+      textarea {
+        min-height: 76px;
+        resize: vertical;
+      }
+
+      .charts-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      @media (min-width: 600px) {
+        .charts-container {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .chart-box {
+        position: relative;
+        width: 100%;
+        height: 230px;
+      }
+
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        white-space: nowrap;
+      }
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 8px 10px;
+        text-align: right;
+        vertical-align: top;
+      }
+      th {
+        background-color: var(--primary);
+        color: white;
+      }
+      tr:nth-child(even) {
+        background-color: #f9fafb;
+      }
+
+      .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: white;
+        font-weight: bold;
+        display: inline-block;
+      }
+      .badge-pass {
+        background-color: var(--success);
+      }
+      .badge-reject {
+        background-color: var(--danger);
+      }
+      .badge-conditional {
+        background-color: var(--warning);
+      }
+      .badge-critical {
+        background-color: #900c3f;
+      }
+      .badge-major {
+        background-color: #c70039;
+      }
+      .badge-minor {
+        background-color: #ffc300;
+        color: #000;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      .tab-btn {
+        padding: 10px 15px;
+        background: #e0e0e0;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.85rem;
+      }
+      .tab-btn.active {
+        background: var(--primary);
+        color: white;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 450px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .modal-header {
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+        color: var(--primary);
+      }
+      .modal-footer {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 15px;
+      }
+
+      .img-preview {
+        max-width: 60px;
+        max-height: 60px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        cursor: pointer;
+      }
+      .alert-bar {
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+        font-weight: bold;
+        display: none;
+      }
+      .alert-danger {
+        background-color: #fadbd8;
+        color: #78281f;
+        border: 1px solid #f5b7b1;
+      }
+      .alert-warning {
+        background-color: #fff3cd;
+        color: #7a4b00;
+        border: 1px solid #f1d58a;
+      }
+
+      .filter-bar {
+        display: grid;
+        grid-template-columns: minmax(180px, 1fr) 180px auto;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .filter-bar input,
+      .filter-bar select {
+        min-height: 40px;
+      }
+      .filter-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-height: 40px;
+        padding: 0 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: #f8fafc;
+        color: #475569;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .filter-toggle:has(input:checked) {
+        background: #fff3cd;
+        border-color: var(--warning);
+        color: #7a4b00;
+      }
+      .empty-state {
+        padding: 24px 12px;
+        color: #6b7280;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+      .clear-filters {
+        min-height: 40px;
+        padding: 0 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: #fff;
+        color: var(--primary-dark);
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .toast {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        z-index: 1200;
+        max-width: min(360px, calc(100vw - 32px));
+        padding: 12px 16px;
+        border-radius: 8px;
+        background: var(--primary-dark);
+        color: #fff;
+        box-shadow: 0 6px 18px rgba(35, 72, 107, 0.2);
+        font-size: 0.85rem;
+        opacity: 0;
+        transform: translateY(12px);
+        pointer-events: none;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+      }
+      .toast.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .photo-tools {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .photo-count {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+      .voice-button {
+        flex: 0 0 auto;
+        background: #e8f0f2;
+        color: var(--primary-dark);
+        border: 1px solid var(--border);
+        min-height: 40px;
+      }
+      .voice-button.is-listening {
+        background: #f9e7e7;
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+      .quick-actions,
+      .note-templates {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 8px 0 12px;
+      }
+      .quick-actions .btn,
+      .note-templates .btn {
+        flex: 0 1 auto;
+        min-height: 38px;
+        padding: 7px 10px;
+        font-size: 0.75rem;
+      }
+      .draft-status {
+        color: var(--muted);
+        font-size: 0.75rem;
+        margin-top: 5px;
+      }
+
+      .pdf-export {
+        background: #fff;
+        padding: 0;
+      }
+      .report-heading {
+        display: none;
+        margin-bottom: 12px;
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 8px;
+      }
+      .report-heading strong {
+        display: block;
+        color: var(--primary-dark);
+        font-size: 1.2rem;
+      }
+      .report-heading span {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+      .report-meta {
+        display: none;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .report-meta div {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 7px 9px;
+        background: #f8fafc;
+        color: var(--text);
+        font-size: 0.75rem;
+      }
+      .report-meta strong {
+        display: block;
+        color: var(--primary);
+        font-size: 0.7rem;
+        margin-bottom: 2px;
+      }
+      .pdf-export .report-heading {
+        display: block;
+      }
+      .pdf-export .report-meta {
+        display: grid;
+      }
+      .pdf-export #reportArea {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        background: #fff;
+        overflow: visible;
+      }
+      .pdf-export .main-grid {
+        display: block;
+      }
+      .pdf-export .form-card,
+      .pdf-export .no-print {
+        display: none !important;
+      }
+      .pdf-export .card,
+      .pdf-export .stat-card {
+        box-shadow: none;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .pdf-export .charts-container {
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+      }
+      .pdf-export .stats-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        width: 100%;
+      }
+      .pdf-export .chart-box {
+        height: 250px;
+      }
+      .pdf-export .table-responsive {
+        overflow: visible;
+      }
+      .pdf-export table {
+        display: table;
+        width: 100%;
+        white-space: normal;
+        table-layout: fixed;
+        font-size: 11px;
+      }
+      .pdf-export thead {
+        display: table-header-group;
+      }
+      .pdf-export tbody {
+        display: table-row-group;
+      }
+      .pdf-export tbody tr {
+        display: table-row;
+        width: 100%;
+        background: #fff;
+      }
+      .pdf-export tbody td {
+        display: table-cell;
+        min-width: 0;
+        border: 1px solid var(--border);
+        padding: 7px;
+        overflow-wrap: anywhere;
+        white-space: normal;
+        line-height: 1.55;
+      }
+      .pdf-export tbody td::before {
+        content: none;
+      }
+      .pdf-export tbody td.no-print {
+        display: none !important;
+      }
+      .pdf-export th,
+      .pdf-export td {
+        padding: 6px;
+      }
+      .pdf-export th {
+        font-size: 10px;
+      }
+      .pdf-export tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .pdf-export .stats-grid,
+      .pdf-export .charts-container {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .pdf-export .img-preview {
+        max-width: 70px;
+        max-height: 70px;
+      }
+      .shift-report {
+        width: 1100px;
+        background: #fff;
+        color: #263238;
+        direction: rtl;
+        padding: 28px;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+      }
+      .shift-report-header {
+        border-bottom: 3px solid #23486b;
+        padding-bottom: 14px;
+        margin-bottom: 16px;
+      }
+      .shift-report-header h1 {
+        color: #23486b;
+        margin: 0 0 5px;
+        font-size: 24px;
+      }
+      .shift-report-header p {
+        color: #68777d;
+        margin: 3px 0;
+      }
+      .shift-report-summary {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+      .shift-report-summary div {
+        border: 1px solid #d7e0e3;
+        border-radius: 6px;
+        padding: 9px;
+        background: #f8fafc;
+      }
+      .shift-report-summary strong {
+        display: block;
+        color: #2f5d8c;
+        font-size: 11px;
+        margin-bottom: 4px;
+      }
+      .shift-report-summary span {
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .shift-report h2 {
+        color: #23486b;
+        border-bottom: 2px solid #d7e0e3;
+        padding-bottom: 6px;
+        font-size: 17px;
+      }
+      .shift-report table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-size: 10px;
+      }
+      .shift-report th,
+      .shift-report td {
+        border: 1px solid #d7e0e3;
+        padding: 7px;
+        text-align: right;
+        vertical-align: top;
+        overflow-wrap: anywhere;
+        white-space: normal;
+        line-height: 1.55;
+      }
+      .shift-report th {
+        background: #23486b;
+        color: #fff;
+      }
+      .shift-report tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .shift-report img {
+        width: 64px;
+        height: 64px;
+        object-fit: cover;
+        margin: 2px;
+        border: 1px solid #d7e0e3;
+      }
+      .shift-report-footer {
+        color: #68777d;
+        border-top: 1px solid #d7e0e3;
+        margin-top: 16px;
+        padding-top: 8px;
+        font-size: 10px;
+      }
+      @media (max-width: 700px) {
+        .shift-report-summary {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 600px) {
+        #reportArea {
+          max-width: 100%;
+          overflow: hidden;
+        }
+        body {
+          font-size: 15px;
+        }
+        .header {
+          padding: 14px;
+          border-radius: 10px;
+        }
+        .header-title h1 {
+          font-size: 1.1rem;
+          line-height: 1.5;
+        }
+        .header-title small {
+          display: block;
+          line-height: 1.6;
+        }
+        .btn-group {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+        }
+        .btn-group .btn:first-child {
+          grid-column: 1 / -1;
+        }
+        .tabs {
+          gap: 6px;
+          margin-bottom: 10px;
+          overflow-x: auto;
+          padding-bottom: 3px;
+        }
+        .tab-btn {
+          flex: 0 0 auto;
+          min-height: var(--touch-target);
+          padding-inline: 12px;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+        }
+        .stat-card {
+          padding: 10px 6px;
+        }
+        .stat-card .number {
+          font-size: 1.15rem;
+        }
+        .card {
+          padding: 12px;
+          border-radius: 8px;
+        }
+        .charts-container {
+          gap: 10px;
+        }
+        .filter-bar {
+          grid-template-columns: 1fr;
+        }
+        .clear-filters {
+          width: 100%;
+        }
+        .filter-toggle {
+          justify-content: flex-start;
+        }
+        .chart-box {
+          height: 210px;
+        }
+        .table-responsive {
+          overflow: visible;
+        }
+        table,
+        tbody,
+        tr,
+        td {
+          display: block;
+          width: 100%;
+        }
+        table {
+          white-space: normal;
+        }
+        thead {
+          display: none;
+        }
+        tbody tr {
+          background: #fff;
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          margin-bottom: 10px;
+          overflow: hidden;
+        }
+        tbody tr:nth-child(even) {
+          background: #fff;
+        }
+        tbody td {
+          display: grid;
+          grid-template-columns: minmax(92px, 30%) minmax(0, 1fr);
+          gap: 8px;
+          border: 0;
+          border-bottom: 1px solid #edf0f2;
+          padding: 10px;
+          overflow-wrap: anywhere;
+        }
+        tbody td:last-child {
+          border-bottom: 0;
+        }
+        tbody td::before {
+          content: attr(data-label);
+          color: #65717e;
+          font-size: 0.75rem;
+          font-weight: 700;
+        }
+        tbody td.no-print {
+          display: flex;
+          justify-content: flex-start;
+          gap: 8px;
+        }
+        tbody td.no-print::before {
+          content: "";
+        }
+        .badge {
+          justify-self: start;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .pdf-export .report-meta {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media print {
+        .pdf-export {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-title">
+        <span class="factory-name">Pack to Pack</span>
+        <h1>منظومة تفتيش الجودة</h1>
+        <small>تسجيل الفحوصات ومتابعة الجودة والتواصل مع المدير</small>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-whatsapp" onclick="sendToManagerWhatsApp()">
+          💬 إرسال التقرير للواتساب
+        </button>
+        <button class="btn btn-whatsapp" onclick="sendCurrentShiftSummary()">
+          🕒 ملخص الوردية
+        </button>
+        <button class="btn btn-whatsapp" onclick="sendShiftPdfToManager()">
+          📄 PDF كامل للوردية
+        </button>
+        <button class="btn btn-success" onclick="exportToCSV()">Excel</button>
+        <button class="btn btn-secondary" onclick="exportBackup()">
+          💾 حفظ نسخة احتياطية
+        </button>
+        <button class="btn btn-secondary" onclick="importBackup()">
+          📂 استرجاع البيانات
+        </button>
+        <button class="btn btn-secondary" onclick="openSettings()">
+          ⚙️ الإعدادات
+        </button>
+        <button
+          class="btn btn-secondary install-button"
+          id="installAppBtn"
+          onclick="installApp()"
+          hidden
+        >
+          📲 تثبيت التطبيق
+        </button>
+        <input
+          type="file"
+          id="backupInput"
+          style="display: none"
+          onchange="processBackup(this)"
+        />
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('today')">
+        📌 فحوصات اليوم
+      </button>
+      <button class="tab-btn" onclick="switchTab('history')">
+        📜 الأرشيف السجل الكامل
+      </button>
+    </div>
+
+    <div id="defectRateAlert" class="alert-bar alert-danger">
+      🚨 تنبيه حرج: نسبة المرفوض تجاوزت الحد المسموح بها (أكثر من 3%)! يرجى
+      اتخاذ قرار إيقاف الماكينات المسببة.
+    </div>
+    <div id="followUpAlert" class="alert-bar alert-warning"></div>
+
+    <div id="reportArea">
+      <div class="report-heading">
+        <strong>Pack to Pack</strong>
+        <span>تقرير تفتيش ومراقبة الجودة</span>
+        <div class="report-meta">
+          <div><strong>الفترة</strong><span id="reportPeriod">-</span></div>
+          <div>
+            <strong>إجمالي الفحوصات</strong><span id="reportTotal">-</span>
+          </div>
+          <div>
+            <strong>المقبول / المرفوض</strong
+            ><span id="reportDecisions">-</span>
+          </div>
+          <div><strong>معدل الرفض</strong><span id="reportRate">-</span></div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card" style="border-color: var(--primary)">
+          <div class="number" id="total-inspections">0</div>
+          <div class="label">إجمالي الفحوصات</div>
+        </div>
+        <div class="stat-card" style="border-color: var(--success)">
+          <div class="number" id="passed-count">0</div>
+          <div class="label">عينات مقبولة</div>
+        </div>
+        <div class="stat-card" style="border-color: var(--danger)">
+          <div class="number" id="rejected-count">0</div>
+          <div class="label">عينات مرفوضة</div>
+        </div>
+        <div class="stat-card" style="border-color: var(--primary)">
+          <div class="number" id="defect-rate">0%</div>
+          <div class="label">معدل الرفض (%)</div>
+        </div>
+        <div class="stat-card" style="border-color: var(--warning)">
+          <div class="number" id="top-defect">-</div>
+          <div class="label">العيب الأبرز</div>
+        </div>
+      </div>
+
+      <div class="main-grid">
+        <div class="card form-card">
+          <h2>تسجيل فحص عينة جودة محمي</h2>
+          <div class="quick-actions" aria-label="اختصارات الفحص">
+            <button
+              type="button"
+              class="btn btn-success"
+              onclick="fillNormalInspection()"
+            >
+              ✅ كل شيء سليم
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="startQuickInspection()"
+            >
+              ⚡ فحص سريع
+            </button>
+            <button
+              type="button"
+              class="btn btn-warning"
+              onclick="clearDraft()"
+            >
+              🧹 مسح المسودة
+            </button>
+          </div>
+          <form id="inspectionForm">
+            <input type="hidden" id="editIndex" value="-1" />
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>التاريخ</label>
+                <input
+                  type="date"
+                  id="inspectionDate"
+                  aria-label="تاريخ الفحص"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>الوردية</label>
+                <select id="shift">
+                  <option value="الأولى">الأولى (صباحية)</option>
+                  <option value="الثانية">الثانية (مسائية)</option>
+                  <option value="الثالثة">الثالثة (ليلية)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>اسم المفتش</label>
+                <input
+                  type="text"
+                  id="inspectorName"
+                  placeholder="اسمك"
+                  autocomplete="name"
+                />
+              </div>
+              <div class="form-group">
+                <label>حالة المتابعة</label>
+                <select id="followUpStatus">
+                  <option value="مفتوح">مفتوح - يحتاج متابعة</option>
+                  <option value="تحت الإجراء">تحت الإجراء</option>
+                  <option value="تم الحل">تم الحل</option>
+                  <option value="غير مطلوب">غير مطلوب</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>الماكينة</label>
+                <select id="machineNo" required>
+                  <option value="">اختر الماكينة...</option>
+                  <script>
+                    for (let i = 1; i <= 17; i++) {
+                      document.write(
+                        `<option value="ماكينة ${i}">ماكينة ${i}</option>`,
+                      );
+                    }
+                  </script>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>اسم المنتج</label>
+                <input
+                  type="text"
+                  id="productName"
+                  placeholder="غطاء / علبة..."
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>الفجوة (Cavity)</label>
+                <input
+                  type="text"
+                  id="cavityNo"
+                  placeholder="Cavity #2 أو الكل"
+                />
+              </div>
+              <div class="form-group">
+                <label>نوع الخامة ورقم الـ Batch</label>
+                <input
+                  type="text"
+                  id="materialBatch"
+                  placeholder="PP Sabic / Batch: 9022"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="sampleWeight">وزن العينة</label>
+                <input
+                  type="number"
+                  id="sampleWeight"
+                  min="0"
+                  step="0.001"
+                  inputmode="decimal"
+                  placeholder="مثال: 12.50"
+                />
+              </div>
+              <div class="form-group">
+                <label for="weightUnit">وحدة الوزن</label>
+                <select id="weightUnit">
+                  <option value="جرام">جرام</option>
+                  <option value="كيلوجرام">كيلوجرام</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>اسم فني التشغيل</label>
+                <input
+                  type="text"
+                  id="technicianName"
+                  placeholder="اسم الفني المسؤول"
+                />
+              </div>
+              <div class="form-group">
+                <label>قرار الجودة</label>
+                <select id="status" required>
+                  <option value="مقبول">مقبول (مطابق)</option>
+                  <option value="مرفوض">مرفوض (غير مطابق)</option>
+                  <option value="مقبول بشرط">مقبول بشرط / فرز</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>درجة خطورة العيب</label>
+                <select id="severity">
+                  <option value="بدون">بدون عيب (سليم)</option>
+                  <option value="ثانوي (Minor)">ثانوي (Minor)</option>
+                  <option value="رئيسي (Major)">رئيسي (Major)</option>
+                  <option value="حرج (Critical)">حرج (Critical)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>إصدار وتنبيه الفني</label>
+                <select id="techAck">
+                  <option value="تم الإبلاغ والتعديل">
+                    تم الإبلاغ والجاري التعديل
+                  </option>
+                  <option value="تم تنبيه الفني">تم التنبيه فقط</option>
+                  <option value="رفض التوقف/التعديل">
+                    رفض الفني التوقف (حماية جودة)
+                  </option>
+                  <option value="غير مطلوب">غير مطلوب (سليم)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>نوع العيب (إن وجد)</label>
+              <select id="defectType">
+                <option value="لا يوجد عيوب">لا يوجد عيوب (سليم)</option>
+                <option value="حقن ناقص (Short Shot)">
+                  حقن ناقص (Short Shot)
+                </option>
+                <option value="رايش زائد (Flash)">رايش زائد (Flash)</option>
+                <option value="انكماش سطحي (Sink Marks)">
+                  انكماش سطحي (Sink Marks)
+                </option>
+                <option value="خطوط لحام (Weld Lines)">
+                  خطوط لحام (Weld Lines)
+                </option>
+                <option value="فقاعات/فضة (Silver Streaks)">
+                  فقاعات/فضة (Silver Streaks)
+                </option>
+                <option value="اعوجاج (Warpage)">اعوجاج (Warpage)</option>
+                <option value="تلوث/بقع لونية">تلوث/بقع لونية</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>إثبات بالصورة (العينة)</label>
+              <div class="photo-tools">
+                <input
+                  type="file"
+                  id="defectImage"
+                  accept="image/*"
+                  capture="environment"
+                  multiple
+                />
+                <span class="photo-count" id="photoCount"
+                  >لم يتم اختيار صور</span
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>ملاحظات الجودة والإجراء المتبع</label>
+              <div class="note-templates" aria-label="قوالب الملاحظات">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="useNoteTemplate('تم إبلاغ الفني وبدء التعديل.')"
+                >
+                  إبلاغ الفني
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="
+                    useNoteTemplate('تم تعديل حرارة السلندر ومتابعة العينة.')
+                  "
+                >
+                  حرارة السلندر
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="
+                    useNoteTemplate('تم تعديل حرارة القالب ومتابعة العينة.')
+                  "
+                >
+                  حرارة القالب
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  onclick="
+                    useNoteTemplate('تم عزل الكمية غير المطابقة وإعادة الفحص.')
+                  "
+                >
+                  عزل وإعادة فحص
+                </button>
+              </div>
+              <textarea
+                id="actionTaken"
+                rows="2"
+                placeholder="تعديل حرارة/حرارة قالب/تنبيه الفني..."
+              ></textarea>
+              <button
+                type="button"
+                class="btn voice-button"
+                id="voiceNoteBtn"
+                onclick="toggleVoiceNote()"
+              >
+                🎙️ إملاء صوتي للملاحظات
+              </button>
+              <button
+                type="button"
+                class="btn btn-whatsapp"
+                style="margin-top: 5px"
+                onclick="sendNoteToManagerWhatsApp()"
+              >
+                💬 إرسال الملاحظة للمدير
+              </button>
+              <div
+                class="draft-status"
+                id="draftStatus"
+                aria-live="polite"
+              ></div>
+            </div>
+
+            <button
+              type="submit"
+              id="submitBtn"
+              class="btn btn-primary"
+              style="width: 100%"
+            >
+              حفظ قرار الفحص
+            </button>
+            <button
+              type="button"
+              id="saveAndSendBtn"
+              class="btn btn-whatsapp"
+              style="width: 100%; margin-top: 5px"
+              onclick="saveAndSendInspection()"
+            >
+              💬 حفظ وإرسال للمدير
+            </button>
+            <button
+              type="button"
+              id="cancelEditBtn"
+              class="btn btn-secondary"
+              style="width: 100%; margin-top: 5px; display: none"
+              onclick="resetForm()"
+            >
+              إلغاء التعديل
+            </button>
+          </form>
+        </div>
+
+        <div>
+          <div class="card">
+            <h2>تحليل عيوب الجودة والقرارات</h2>
+            <div class="charts-container">
+              <div class="chart-box"><canvas id="statusChart"></canvas></div>
+              <div class="chart-box"><canvas id="defectsChart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 id="tableTitle">جدول فحوصات اليوم</h2>
+            <div
+              class="filter-bar"
+              role="search"
+              aria-label="البحث في سجلات الفحص"
+            >
+              <input
+                type="search"
+                id="logSearch"
+                placeholder="ابحث بالماكينة أو المنتج أو الفني أو العيب..."
+                aria-label="البحث في السجلات"
+              />
+              <select id="statusFilter" aria-label="تصفية حسب القرار">
+                <option value="all">كل القرارات</option>
+                <option value="مقبول">مقبول</option>
+                <option value="مرفوض">مرفوض</option>
+                <option value="مقبول بشرط">مقبول بشرط</option>
+              </select>
+              <label class="filter-toggle">
+                <input
+                  type="checkbox"
+                  id="importantOnly"
+                  aria-label="عرض الحالات المهمة فقط"
+                />
+                الحالات المهمة فقط
+              </label>
+              <button type="button" class="clear-filters" id="clearFiltersBtn">
+                مسح الفلاتر
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table id="inspectionTable">
+                <thead>
+                  <tr>
+                    <th>التاريخ/الوردية</th>
+                    <th>الماكينة/المنتج</th>
+                    <th>الخامة/الفني</th>
+                    <th>القرار والخطورة</th>
+                    <th>العيب</th>
+                    <th>الصورة</th>
+                    <th>الإجراء والإبلاغ</th>
+                    <th class="no-print">العمليات</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="confirmModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header" id="modalTitle">تأكيد الإجراء</div>
+        <div id="modalBody">هل أنت متأكد من استمرار هذا الإجراء؟</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" onclick="closeModal()">
+            إلغاء
+          </button>
+          <button class="btn btn-danger btn-sm" id="confirmActionBtn">
+            تأكيد
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="settingsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">إعدادات Pack to Pack</div>
+        <div class="form-group">
+          <label for="factoryNameSetting">اسم المصنع</label>
+          <input id="factoryNameSetting" type="text" />
+        </div>
+        <div class="form-group">
+          <label for="managerPhoneSetting">رقم المدير مع كود الدولة</label>
+          <input id="managerPhoneSetting" type="tel" inputmode="tel" />
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" onclick="closeSettings()">
+            إلغاء
+          </button>
+          <button class="btn btn-success btn-sm" onclick="saveSettings()">
+            حفظ الإعدادات
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script>
+      const DEFAULT_MANAGER_PHONE = "201033992322";
+      const STORAGE_KEY = "qms_inspection_logs_v3";
+      const SETTINGS_KEY = "qms_settings_v1";
+      const INSPECTOR_STORAGE_KEY = "qms_inspector_name_v1";
+      const DRAFT_STORAGE_KEY = "qms_inspection_draft_v1";
+
+      const settings = loadSettings();
+
+      let allLogs = loadLogs();
+      let currentTab = "today";
+      let chartStatus = null,
+        chartDefects = null;
+      let pendingAction = null;
+      let currentImages = [];
+      let filteredLogs = [];
+      let speechRecognition = null;
+      let voiceNoteBase = "";
+      let toastTimer = null;
+      let deferredInstallPrompt = null;
+
+      function updateInstallButton() {
+        const button = document.getElementById("installAppBtn");
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        const isStandalone =
+          window.matchMedia("(display-mode: standalone)").matches ||
+          navigator.standalone === true;
+        button.hidden = isStandalone || (!deferredInstallPrompt && !isIOS);
+      }
+
+      window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        updateInstallButton();
+      });
+
+      window.addEventListener("appinstalled", () => {
+        deferredInstallPrompt = null;
+        updateInstallButton();
+        showToast("تم تثبيت التطبيق على جهازك.");
+      });
+
+      updateInstallButton();
+
+      async function installApp() {
+        if (window.matchMedia("(display-mode: standalone)").matches) {
+          showToast("التطبيق مثبت بالفعل على جهازك.");
+          return;
+        }
+        if (!deferredInstallPrompt) {
+          const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+          showToast(
+            isIOS
+              ? "اضغط مشاركة في Safari ثم إضافة إلى الشاشة الرئيسية."
+              : "افتح قائمة المتصفح ثم اختر تثبيت التطبيق أو إضافة إلى الشاشة الرئيسية.",
+          );
+          return;
+        }
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        updateInstallButton();
+      }
+
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("sw.js").catch(() => {});
+        });
+      }
+
+      function getLocalDate(date = new Date()) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function setTodayDate() {
+        document.getElementById("inspectionDate").value = getLocalDate();
+      }
+
+      function getInspectorName() {
+        return localStorage.getItem(INSPECTOR_STORAGE_KEY) || "";
+      }
+
+      function loadSettings() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+          return {
+            factoryName: saved?.factoryName || "Pack to Pack",
+            managerPhone: saved?.managerPhone || DEFAULT_MANAGER_PHONE,
+          };
+        } catch {
+          return {
+            factoryName: "Pack to Pack",
+            managerPhone: DEFAULT_MANAGER_PHONE,
+          };
+        }
+      }
+
+      function openSettings() {
+        document.getElementById("factoryNameSetting").value =
+          settings.factoryName;
+        document.getElementById("managerPhoneSetting").value =
+          settings.managerPhone;
+        document.getElementById("settingsModal").style.display = "flex";
+      }
+
+      function closeSettings() {
+        document.getElementById("settingsModal").style.display = "none";
+      }
+
+      function saveSettings() {
+        const factoryName = document
+          .getElementById("factoryNameSetting")
+          .value.trim();
+        const managerPhone = document
+          .getElementById("managerPhoneSetting")
+          .value.replace(/\D/g, "");
+        if (!factoryName || managerPhone.length < 8) {
+          alert("يرجى إدخال اسم المصنع ورقم مدير صحيح.");
+          return;
+        }
+        settings.factoryName = factoryName;
+        settings.managerPhone = managerPhone;
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+        document.querySelector(".factory-name").textContent = factoryName;
+        document.querySelector(".report-heading strong").textContent =
+          factoryName;
+        closeSettings();
+        alert("تم حفظ الإعدادات.");
+      }
+
+      function loadLogs() {
+        try {
+          const storedLogs = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          return Array.isArray(storedLogs) ? storedLogs : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function saveLogs() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(allLogs));
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("is-visible");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(
+          () => toast.classList.remove("is-visible"),
+          2800,
+        );
+      }
+
+      function getFormDraft() {
+        const draft = {};
+        [
+          "inspectionDate",
+          "shift",
+          "inspectorName",
+          "followUpStatus",
+          "machineNo",
+          "productName",
+          "cavityNo",
+          "materialBatch",
+          "sampleWeight",
+          "weightUnit",
+          "technicianName",
+          "status",
+          "severity",
+          "techAck",
+          "defectType",
+          "actionTaken",
+        ].forEach((id) => {
+          draft[id] = document.getElementById(id).value;
+        });
+        return draft;
+      }
+
+      function saveDraft() {
+        if (document.getElementById("editIndex").value !== "-1") return;
+        const draft = getFormDraft();
+        if (Object.values(draft).some((value) => value.trim())) {
+          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+          document.getElementById("draftStatus").textContent =
+            "تم حفظ المسودة تلقائيًا";
+        }
+      }
+
+      function restoreDraft() {
+        try {
+          const draft = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY));
+          if (!draft || !Object.values(draft).some((value) => value)) return;
+          Object.entries(draft).forEach(([id, value]) => {
+            const field = document.getElementById(id);
+            if (field && value !== undefined) field.value = value;
+          });
+          document.getElementById("draftStatus").textContent =
+            "تم استرجاع مسودة غير مكتملة";
+          showToast("تم استرجاع الفحص الذي لم يكتمل.");
+        } catch {
+          localStorage.removeItem(DRAFT_STORAGE_KEY);
+        }
+      }
+
+      function clearDraft() {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        const status = document.getElementById("draftStatus");
+        if (status) status.textContent = "";
+        showToast("تم مسح المسودة.");
+      }
+
+      function useNoteTemplate(template) {
+        const notes = document.getElementById("actionTaken");
+        notes.value = notes.value.trim()
+          ? `${notes.value.trim()} ${template}`
+          : template;
+        saveDraft();
+        notes.focus();
+      }
+
+      function fillNormalInspection() {
+        document.getElementById("status").value = "مقبول";
+        document.getElementById("severity").value = "بدون";
+        document.getElementById("defectType").value = "لا يوجد عيوب";
+        document.getElementById("techAck").value = "غير مطلوب";
+        document.getElementById("followUpStatus").value = "غير مطلوب";
+        document.getElementById("actionTaken").value = "مطابق للمواصفات";
+        saveDraft();
+        showToast("تم تجهيز فحص سليم. أكمل الماكينة والمنتج ثم احفظ.");
+      }
+
+      function startQuickInspection() {
+        resetForm();
+        fillNormalInspection();
+        document.getElementById("machineNo").focus();
+      }
+
+      function formatInspectionTime(isoDate) {
+        if (!isoDate) return "وقت غير مسجل";
+        const date = new Date(isoDate);
+        if (Number.isNaN(date.getTime())) return "وقت غير مسجل";
+        return date.toLocaleTimeString("ar-EG", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      function clearFilters() {
+        document.getElementById("logSearch").value = "";
+        document.getElementById("statusFilter").value = "all";
+        document.getElementById("importantOnly").checked = false;
+        renderView();
+      }
+
+      function appendCell(row, value) {
+        const cell = document.createElement("td");
+        String(value ?? "")
+          .split("\n")
+          .forEach((line, index, lines) => {
+            cell.appendChild(document.createTextNode(line));
+            if (index < lines.length - 1)
+              cell.appendChild(document.createElement("br"));
+          });
+        row.appendChild(cell);
+      }
+
+      function appendBadge(cell, value, className) {
+        const badge = document.createElement("span");
+        badge.className = `badge ${className}`;
+        badge.textContent = value || "-";
+        cell.appendChild(badge);
+        if (className !== "badge-pass" || value !== "مقبول") {
+          badge.style.marginTop = "2px";
+        }
+        if (cell.children.length > 1)
+          cell.insertBefore(document.createElement("br"), badge);
+      }
+
+      function createActionButton(icon, label, className, action) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `btn ${className} btn-sm`;
+        button.textContent = icon;
+        button.title = label;
+        button.setAttribute("aria-label", label);
+        button.addEventListener("click", action);
+        return button;
+      }
+
+      setTodayDate();
+      document.getElementById("inspectorName").value = getInspectorName();
+      restoreDraft();
+
+      document
+        .getElementById("inspectionForm")
+        .addEventListener("input", saveDraft);
+      document
+        .getElementById("inspectionForm")
+        .addEventListener("change", saveDraft);
+
+      document.getElementById("defectImage").addEventListener("change", (e) => {
+        const files = [...e.target.files];
+        if (!files.length) return;
+        Promise.all(files.map(compressImage)).then((images) => {
+          currentImages = images;
+          document.getElementById("photoCount").textContent =
+            `${images.length} صورة جاهزة للحفظ`;
+        });
+      });
+
+      ["logSearch", "statusFilter", "importantOnly"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", renderView);
+        document.getElementById(id).addEventListener("change", renderView);
+      });
+      document
+        .getElementById("clearFiltersBtn")
+        .addEventListener("click", clearFilters);
+
+      window.onload = function () {
+        renderView();
+      };
+
+      document
+        .getElementById("inspectionForm")
+        .addEventListener("submit", (e) => {
+          e.preventDefault();
+          if (!validateInspection()) return;
+          const editIndex = Number.parseInt(
+            document.getElementById("editIndex").value,
+            10,
+          );
+
+          if (editIndex > -1) {
+            openModal(
+              "تأكيد التعديل",
+              "هل تريد حفظ التعديلات على هذا السجل؟",
+              () => {
+                saveLog(editIndex);
+              },
+            );
+          } else {
+            saveLog(-1);
+          }
+        });
+
+      function saveAndSendInspection() {
+        if (!validateInspection()) return;
+        const editIndex = Number.parseInt(
+          document.getElementById("editIndex").value,
+          10,
+        );
+        if (editIndex > -1) {
+          openModal(
+            "تأكيد التعديل والإرسال",
+            "هل تريد حفظ التعديلات وإرسالها للمدير؟",
+            () => saveLog(editIndex, true),
+          );
+        } else {
+          saveLog(-1, true);
+        }
+      }
+
+      function validateInspection() {
+        const status = document.getElementById("status").value;
+        const severity = document.getElementById("severity").value;
+        const defectType = document.getElementById("defectType").value;
+        const action = document.getElementById("actionTaken").value.trim();
+        const weight = document.getElementById("sampleWeight").value;
+        const hasDefect = defectType !== "لا يوجد عيوب";
+        const isRejectedOrCritical =
+          status === "مرفوض" || severity.includes("حرج");
+
+        if (isRejectedOrCritical && !hasDefect) {
+          alert("يرجى تحديد نوع العيب قبل حفظ الفحص المرفوض أو الحرج.");
+          document.getElementById("defectType").focus();
+          return false;
+        }
+
+        if (isRejectedOrCritical && !action) {
+          alert("يرجى تسجيل الإجراء المتخذ للفحص المرفوض أو الحرج.");
+          document.getElementById("actionTaken").focus();
+          return false;
+        }
+
+        if (weight && Number(weight) < 0) {
+          alert("يرجى إدخال وزن صحيح لا يقل عن صفر.");
+          document.getElementById("sampleWeight").focus();
+          return false;
+        }
+
+        return true;
+      }
+
+      function compressImage(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const image = new Image();
+            image.onload = () => {
+              const maxSize = 1200;
+              const scale = Math.min(
+                1,
+                maxSize / Math.max(image.width, image.height),
+              );
+              const canvas = document.createElement("canvas");
+              canvas.width = Math.round(image.width * scale);
+              canvas.height = Math.round(image.height * scale);
+              canvas
+                .getContext("2d")
+                .drawImage(image, 0, 0, canvas.width, canvas.height);
+              resolve(canvas.toDataURL("image/jpeg", 0.78));
+            };
+            image.onerror = reject;
+            image.src = event.target.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function toggleVoiceNote() {
+        const SpeechRecognition =
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+        const button = document.getElementById("voiceNoteBtn");
+
+        if (!SpeechRecognition) {
+          alert(
+            "الإملاء الصوتي يحتاج Chrome أو Safari بإذن الميكروفون، ويفضل فتح الموقع عبر HTTPS.",
+          );
+          return;
+        }
+
+        if (speechRecognition) {
+          speechRecognition.stop();
+          return;
+        }
+
+        speechRecognition = new SpeechRecognition();
+        speechRecognition.lang = "ar-EG";
+        speechRecognition.interimResults = false;
+        speechRecognition.continuous = false;
+        voiceNoteBase = document.getElementById("actionTaken").value.trim();
+        button.classList.add("is-listening");
+        button.textContent = "⏹️ إيقاف الإملاء";
+
+        speechRecognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript.trim();
+          const notes = document.getElementById("actionTaken");
+          notes.value = `${voiceNoteBase} ${transcript}`.trim();
+        };
+        speechRecognition.onerror = (event) => {
+          const message =
+            event.error === "not-allowed"
+              ? "اسمح للمتصفح باستخدام الميكروفون ثم حاول مرة أخرى."
+              : "تعذر التقاط الملاحظة الصوتية. تأكد من اتصالك بالإنترنت وحاول مرة أخرى.";
+          alert(message);
+        };
+        speechRecognition.onend = () => {
+          speechRecognition = null;
+          button.classList.remove("is-listening");
+          button.textContent = "🎙️ إملاء صوتي للملاحظات";
+        };
+        try {
+          speechRecognition.start();
+        } catch {
+          speechRecognition = null;
+          button.classList.remove("is-listening");
+          button.textContent = "🎙️ إملاء صوتي للملاحظات";
+          alert("تعذر بدء الميكروفون. حاول مرة أخرى.");
+        }
+      }
+
+      function sendNoteToManagerWhatsApp() {
+        const note = document.getElementById("actionTaken").value.trim();
+        if (!note) {
+          alert("اكتب أو أمِلِ الملاحظة أولًا قبل إرسالها.");
+          document.getElementById("actionTaken").focus();
+          return;
+        }
+
+        const machine =
+          document.getElementById("machineNo").value || "غير محددة";
+        const product =
+          document.getElementById("productName").value || "غير محدد";
+        const message = `*ملاحظة جودة - ${settings.factoryName}*\nالماكينة: ${machine}\nالمنتج: ${product}\nالملاحظة: ${note}`;
+        const whatsappUrl = `https://wa.me/${settings.managerPhone}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, "_blank");
+      }
+
+      function saveLog(index, sendAfterSave = false) {
+        const logData = {
+          id: index > -1 ? allLogs[index].id : Date.now(),
+          inspectionNo:
+            index > -1
+              ? allLogs[index].inspectionNo || allLogs[index].id
+              : `PTP-${getLocalDate().replaceAll("-", "")}-${String(allLogs.length + 1).padStart(3, "0")}`,
+          createdAt:
+            index > -1
+              ? allLogs[index].createdAt || new Date().toISOString()
+              : new Date().toISOString(),
+          checkedAt:
+            index > -1
+              ? allLogs[index].checkedAt || new Date().toISOString()
+              : new Date().toISOString(),
+          date: document.getElementById("inspectionDate").value,
+          shift: document.getElementById("shift").value,
+          inspectorName:
+            document.getElementById("inspectorName").value.trim() || "غير محدد",
+          followUpStatus: document.getElementById("followUpStatus").value,
+          machine: document.getElementById("machineNo").value,
+          product: document.getElementById("productName").value,
+          cavity: document.getElementById("cavityNo").value || "الكل",
+          material:
+            document.getElementById("materialBatch").value || "غير محدد",
+          weight: document.getElementById("sampleWeight").value || "",
+          weightUnit: document.getElementById("weightUnit").value,
+          techName:
+            document.getElementById("technicianName").value || "غير محدد",
+          status: document.getElementById("status").value,
+          severity: document.getElementById("severity").value,
+          type: document.getElementById("defectType").value,
+          techAck: document.getElementById("techAck").value,
+          action:
+            document.getElementById("actionTaken").value || "مطابق للمواصفات",
+          images:
+            currentImages.length > 0
+              ? currentImages
+              : index > -1
+                ? allLogs[index].images ||
+                  (allLogs[index].image ? [allLogs[index].image] : [])
+                : [],
+        };
+
+        if (index > -1) {
+          allLogs[index] = logData;
+        } else {
+          allLogs.push(logData);
+        }
+
+        saveLogs();
+        localStorage.setItem(
+          INSPECTOR_STORAGE_KEY,
+          document.getElementById("inspectorName").value.trim(),
+        );
+        resetForm();
+        renderView();
+        closeModal();
+        if (sendAfterSave) {
+          sendSingleLogToManagerWhatsApp(logData);
+        } else {
+          showToast(
+            index > -1 ? "تم تحديث الفحص بنجاح." : "تم حفظ الفحص بنجاح.",
+          );
+        }
+      }
+
+      function sendSingleLogToManagerWhatsApp(log) {
+        const message =
+          `*فحص جودة جديد - ${settings.factoryName}*\n` +
+          `رقم الفحص: ${log.inspectionNo || log.id}\n` +
+          `التاريخ والوقت: ${log.date} - ${formatInspectionTime(log.checkedAt)}\n` +
+          `الوردية: ${log.shift}\n` +
+          `الماكينة: ${log.machine}\n` +
+          `المنتج: ${log.product}\n` +
+          `القرار: *${log.status}* | الخطورة: ${log.severity}\n` +
+          `العيب: ${log.type}\n` +
+          `المتابعة: ${log.followUpStatus || "مفتوح"}\n` +
+          `الإجراء: ${log.action}\n` +
+          `الفني: ${log.techName || "غير محدد"}`;
+        window.open(
+          `https://wa.me/${settings.managerPhone}?text=${encodeURIComponent(message)}`,
+          "_blank",
+        );
+        showToast("تم تجهيز رسالة الفحص في واتساب.");
+      }
+
+      function dataUrlToFile(dataUrl, index) {
+        const [header, encoded] = dataUrl.split(",");
+        const mime = header.match(/:(.*?);/)?.[1] || "image/jpeg";
+        const binary = atob(encoded);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index++) {
+          bytes[index] = binary.charCodeAt(index);
+        }
+        return new File([bytes], `فحص-${index + 1}.jpg`, { type: mime });
+      }
+
+      async function shareLog(log) {
+        const message =
+          `فحص جودة - ${settings.factoryName}\n` +
+          `رقم الفحص: ${log.inspectionNo || log.id}\n` +
+          `الماكينة: ${log.machine} | المنتج: ${log.product}\n` +
+          `القرار: ${log.status} | العيب: ${log.type}\n` +
+          `الإجراء: ${log.action}`;
+        const images = log.images || (log.image ? [log.image] : []);
+
+        if (navigator.share) {
+          const files = images.map(dataUrlToFile);
+          if (!files.length || !navigator.canShare?.({ files })) {
+            await navigator.share({ title: "فحص جودة", text: message });
+          } else {
+            await navigator.share({ title: "فحص جودة", text: message, files });
+          }
+          showToast("تم فتح قائمة المشاركة.");
+          return;
+        }
+
+        const whatsappUrl = `https://wa.me/${settings.managerPhone}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, "_blank");
+        showToast("تم تجهيز السجل في واتساب.");
+      }
+
+      function editLog(id) {
+        const index = allLogs.findIndex((l) => l.id === id);
+        if (index === -1) return;
+
+        const log = allLogs[index];
+        document.getElementById("editIndex").value = index;
+        document.getElementById("inspectionDate").value = log.date;
+        document.getElementById("shift").value = log.shift;
+        document.getElementById("inspectorName").value =
+          log.inspectorName === "غير محدد" ? "" : log.inspectorName || "";
+        document.getElementById("followUpStatus").value =
+          log.followUpStatus || "مفتوح";
+        document.getElementById("machineNo").value = log.machine;
+        document.getElementById("productName").value = log.product;
+        document.getElementById("cavityNo").value =
+          log.cavity === "الكل" ? "" : log.cavity;
+        document.getElementById("materialBatch").value = log.material;
+        document.getElementById("sampleWeight").value = log.weight || "";
+        document.getElementById("weightUnit").value = log.weightUnit || "جرام";
+        document.getElementById("technicianName").value = log.techName;
+        document.getElementById("status").value = log.status;
+        document.getElementById("severity").value = log.severity;
+        document.getElementById("defectType").value = log.type;
+        document.getElementById("techAck").value = log.techAck;
+        document.getElementById("actionTaken").value = log.action;
+        currentImages = log.images || (log.image ? [log.image] : []);
+        document.getElementById("photoCount").textContent = currentImages.length
+          ? `${currentImages.length} صورة محفوظة`
+          : "لم يتم اختيار صور";
+
+        document.getElementById("submitBtn").innerText = "حفظ التعديلات";
+        document
+          .getElementById("submitBtn")
+          .classList.replace("btn-primary", "btn-warning");
+        document.getElementById("cancelEditBtn").style.display = "block";
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function deleteLog(id) {
+        openModal(
+          "تأكيد الحذف",
+          "هل أنت متأكد من حذف هذا السجل نهائياً؟",
+          () => {
+            allLogs = allLogs.filter((l) => l.id !== id);
+            saveLogs();
+            renderView();
+            closeModal();
+          },
+        );
+      }
+
+      function resolveLog(id) {
+        const log = allLogs.find((item) => item.id === id);
+        if (!log) return;
+        log.followUpStatus = "تم الحل";
+        log.resolvedAt = new Date().toISOString();
+        saveLogs();
+        renderView();
+        showToast("تم إغلاق حالة المتابعة.");
+      }
+
+      function resetForm() {
+        document.getElementById("inspectionForm").reset();
+        document.getElementById("editIndex").value = "-1";
+        setTodayDate();
+        document.getElementById("submitBtn").innerText = "حفظ قرار الفحص";
+        document
+          .getElementById("submitBtn")
+          .classList.replace("btn-warning", "btn-primary");
+        document.getElementById("cancelEditBtn").style.display = "none";
+        currentImages = [];
+        document.getElementById("photoCount").textContent = "لم يتم اختيار صور";
+        document.getElementById("defectImage").value = "";
+        clearDraft();
+      }
+
+      function openModal(title, body, action) {
+        document.getElementById("modalTitle").innerText = title;
+        document.getElementById("modalBody").innerText = body;
+        pendingAction = action;
+        document.getElementById("confirmModal").style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("confirmModal").style.display = "none";
+        pendingAction = null;
+      }
+
+      document
+        .getElementById("confirmActionBtn")
+        .addEventListener("click", () => {
+          if (pendingAction) pendingAction();
+        });
+
+      function switchTab(tab) {
+        currentTab = tab;
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        if (tab === "today") {
+          document.querySelectorAll(".tab-btn")[0].classList.add("active");
+          document.getElementById("tableTitle").innerText = "جدول فحوصات اليوم";
+        } else {
+          document.querySelectorAll(".tab-btn")[1].classList.add("active");
+          document.getElementById("tableTitle").innerText =
+            "الأرشيف والسجل التاريخي الكامل";
+        }
+        renderView();
+      }
+
+      function updateFollowUpAlert() {
+        const openFollowUps = allLogs.filter(
+          (log) =>
+            (log.followUpStatus || "مفتوح") !== "تم الحل" &&
+            (log.followUpStatus || "مفتوح") !== "غير مطلوب",
+        );
+        const alert = document.getElementById("followUpAlert");
+
+        if (!openFollowUps.length) {
+          alert.style.display = "none";
+          return;
+        }
+
+        alert.textContent = `🔔 متابعة الجودة: يوجد ${openFollowUps.length} حالة مفتوحة تحتاج إجراء أو إغلاق.`;
+        alert.style.display = "block";
+      }
+
+      function renderView() {
+        const todayStr = getLocalDate();
+        let filteredData = [...allLogs];
+
+        if (currentTab === "today") {
+          filteredData = allLogs.filter((log) => log.date === todayStr);
+        }
+
+        const searchTerm = document
+          .getElementById("logSearch")
+          .value.trim()
+          .toLowerCase();
+        const statusFilter = document.getElementById("statusFilter").value;
+        const importantOnly = document.getElementById("importantOnly").checked;
+
+        filteredData = filteredData.filter((log) => {
+          const searchableText = [
+            log.date,
+            log.shift,
+            log.inspectionNo,
+            log.inspectorName,
+            log.followUpStatus,
+            log.machine,
+            log.product,
+            log.material,
+            log.weight,
+            log.weightUnit,
+            log.techName,
+            log.status,
+            log.severity,
+            log.type,
+            log.techAck,
+            log.action,
+          ]
+            .join(" ")
+            .toLowerCase();
+          const matchesSearch =
+            !searchTerm || searchableText.includes(searchTerm);
+          const matchesStatus =
+            statusFilter === "all" || log.status === statusFilter;
+          const matchesImportant =
+            !importantOnly ||
+            log.status !== "مقبول" ||
+            (log.severity || "").includes("حرج");
+          return matchesSearch && matchesStatus && matchesImportant;
+        });
+        filteredLogs = filteredData;
+
+        const tbody = document.querySelector("#inspectionTable tbody");
+        tbody.innerHTML = "";
+
+        if (!filteredData.length) {
+          const emptyRow = document.createElement("tr");
+          const emptyCell = document.createElement("td");
+          emptyCell.colSpan = 8;
+          emptyCell.className = "empty-state";
+          emptyCell.textContent =
+            searchTerm || statusFilter !== "all" || importantOnly
+              ? "لا توجد نتائج مطابقة للفلاتر الحالية."
+              : "لا توجد فحوصات مسجلة في هذه الفترة.";
+          emptyRow.appendChild(emptyCell);
+          tbody.appendChild(emptyRow);
+        }
+
+        let pass = 0;
+        let reject = 0;
+        const defectMap = {};
+        const statusMap = {};
+
+        filteredData
+          .sort((a, b) => b.id - a.id)
+          .forEach((log) => {
+            if (log.status === "مقبول") pass++;
+            else if (log.status === "مرفوض") reject++;
+            statusMap[log.status] = (statusMap[log.status] || 0) + 1;
+
+            if (log.type !== "لا يوجد عيوب") {
+              defectMap[log.type] = (defectMap[log.type] || 0) + 1;
+            }
+
+            let badgeClass = "badge-pass";
+            if (log.status === "مرفوض") badgeClass = "badge-reject";
+            if (log.status === "مقبول بشرط") badgeClass = "badge-conditional";
+
+            let sevClass = "";
+            if ((log.severity || "").includes("حرج"))
+              sevClass = "badge-critical";
+            else if ((log.severity || "").includes("رئيسي"))
+              sevClass = "badge-major";
+            else if ((log.severity || "").includes("ثانوي"))
+              sevClass = "badge-minor";
+
+            const row = document.createElement("tr");
+            appendCell(
+              row,
+              `${log.inspectionNo || log.id}\n${log.date}\n${log.shift}\nوقت الفحص: ${formatInspectionTime(log.checkedAt || log.createdAt)}`,
+            );
+            appendCell(row, `${log.machine}\n${log.product}`);
+            appendCell(
+              row,
+              `خامة: ${log.material}\nوزن: ${log.weight ? `${log.weight} ${log.weightUnit || "جرام"}` : "غير مسجل"}\nفني: ${log.techName}\nمفتش: ${log.inspectorName || "غير محدد"}`,
+            );
+
+            const decisionCell = document.createElement("td");
+            appendBadge(decisionCell, log.status, badgeClass);
+            if (sevClass) appendBadge(decisionCell, log.severity, sevClass);
+            row.appendChild(decisionCell);
+            appendCell(row, `${log.type}\n(${log.cavity})`);
+
+            const imageCell = document.createElement("td");
+            const logImages = log.images || (log.image ? [log.image] : []);
+            if (logImages.length) {
+              logImages.forEach((imageData, imageIndex) => {
+                const image = document.createElement("img");
+                image.src = imageData;
+                image.alt = `صورة عيب ${imageIndex + 1}: ${log.type}`;
+                image.className = "img-preview";
+                image.addEventListener("click", () =>
+                  window.open(imageData, "_blank"),
+                );
+                imageCell.appendChild(image);
+              });
+            } else {
+              imageCell.textContent = "-";
+            }
+            row.appendChild(imageCell);
+
+            const actionCell = document.createElement("td");
+            actionCell.style.whiteSpace = "normal";
+            actionCell.style.minWidth = "140px";
+            actionCell.textContent = log.action;
+            actionCell.appendChild(document.createElement("br"));
+            const acknowledgement = document.createElement("small");
+            acknowledgement.innerHTML = "<b>حالة الفني:</b> ";
+            acknowledgement.appendChild(document.createTextNode(log.techAck));
+            actionCell.appendChild(acknowledgement);
+            const followUp = document.createElement("small");
+            followUp.textContent = `المتابعة: ${log.followUpStatus || "مفتوح"}`;
+            actionCell.appendChild(document.createElement("br"));
+            actionCell.appendChild(followUp);
+            row.appendChild(actionCell);
+
+            const actionsCell = document.createElement("td");
+            actionsCell.className = "no-print";
+            actionsCell.append(
+              createActionButton("✏️", "تعديل السجل", "btn-secondary", () =>
+                editLog(log.id),
+              ),
+              createActionButton("🗑️", "حذف السجل", "btn-danger", () =>
+                deleteLog(log.id),
+              ),
+              createActionButton(
+                "📤",
+                "مشاركة السجل والصور",
+                "btn-whatsapp",
+                () => shareLog(log),
+              ),
+            );
+            if (
+              (log.followUpStatus || "مفتوح") !== "تم الحل" &&
+              (log.followUpStatus || "مفتوح") !== "غير مطلوب"
+            ) {
+              actionsCell.append(
+                createActionButton("✅", "إغلاق المتابعة", "btn-success", () =>
+                  resolveLog(log.id),
+                ),
+              );
+            }
+            row.appendChild(actionsCell);
+
+            [
+              "رقم الفحص والتاريخ والوردية",
+              "الماكينة والمنتج",
+              "الخامة والفني والمفتش",
+              "القرار والخطورة",
+              "العيب والفجوة",
+              "الصورة",
+              "الإجراء والمتابعة",
+              "العمليات",
+            ].forEach((label, index) => {
+              row.children[index].dataset.label = label;
+            });
+            tbody.appendChild(row);
+          });
+
+        const total = filteredData.length;
+        const rate = total > 0 ? ((reject / total) * 100).toFixed(1) : 0;
+
+        document.getElementById("total-inspections").innerText = total;
+        document.getElementById("passed-count").innerText = pass;
+        document.getElementById("rejected-count").innerText = reject;
+        document.getElementById("defect-rate").innerText = rate + "%";
+        document.getElementById("top-defect").innerText = getMaxKey(defectMap);
+        updateFollowUpAlert();
+
+        if (parseFloat(rate) > 3.0) {
+          document.getElementById("defectRateAlert").style.display = "block";
+        } else {
+          document.getElementById("defectRateAlert").style.display = "none";
+        }
+
+        renderCharts(statusMap, defectMap);
+      }
+
+      function getMaxKey(mapObj) {
+        let maxKey = "-",
+          maxVal = 0;
+        for (const [k, v] of Object.entries(mapObj)) {
+          if (v > maxVal) {
+            maxVal = v;
+            maxKey = k;
+          }
+        }
+        return maxKey;
+      }
+
+      function renderCharts(statusMap, defectMap) {
+        const ctx1 = document.getElementById("statusChart").getContext("2d");
+        if (chartStatus) chartStatus.destroy();
+        chartStatus = new Chart(ctx1, {
+          type: "doughnut",
+          data: {
+            labels: Object.keys(statusMap),
+            datasets: [
+              {
+                data: Object.values(statusMap),
+                backgroundColor: ["#39856B", "#C95757", "#C58B35"],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: "bottom" } },
+          },
+        });
+
+        const ctx2 = document.getElementById("defectsChart").getContext("2d");
+        if (chartDefects) chartDefects.destroy();
+        chartDefects = new Chart(ctx2, {
+          type: "bar",
+          data: {
+            labels: Object.keys(defectMap),
+            datasets: [
+              {
+                label: "تكرار العيوب",
+                data: Object.values(defectMap),
+                backgroundColor: "#2F5D8C",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } },
+          },
+        });
+      }
+
+      function updatePdfSummary(logs) {
+        const passed = logs.filter((log) => log.status === "مقبول").length;
+        const rejected = logs.filter((log) => log.status === "مرفوض").length;
+        const rate = logs.length
+          ? ((rejected / logs.length) * 100).toFixed(1)
+          : "0.0";
+        const date = logs[0]?.date || getLocalDate();
+
+        document.getElementById("reportPeriod").textContent = date;
+        document.getElementById("reportTotal").textContent = String(
+          logs.length,
+        );
+        document.getElementById("reportDecisions").textContent =
+          `${passed} / ${rejected}`;
+        document.getElementById("reportRate").textContent = `${rate}%`;
+      }
+
+      function sendCurrentShiftSummary() {
+        const todayStr = getLocalDate();
+        const selectedShift = document.getElementById("shift").value;
+        const shiftLogs = allLogs.filter(
+          (log) => log.date === todayStr && log.shift === selectedShift,
+        );
+        if (!shiftLogs.length) {
+          alert(`لا توجد فحوصات مسجلة للوردية ${selectedShift} اليوم.`);
+          return;
+        }
+
+        const rejected = shiftLogs.filter(
+          (log) => log.status === "مرفوض",
+        ).length;
+        const openCases = shiftLogs.filter(
+          (log) =>
+            (log.followUpStatus || "مفتوح") !== "تم الحل" &&
+            (log.followUpStatus || "مفتوح") !== "غير مطلوب",
+        ).length;
+        const defectCounts = {};
+        shiftLogs.forEach((log) => {
+          if (log.type !== "لا يوجد عيوب") {
+            defectCounts[log.type] = (defectCounts[log.type] || 0) + 1;
+          }
+        });
+        const defects =
+          Object.entries(defectCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([type, count]) => `${type} (${count})`)
+            .join("، ") || "لا توجد عيوب";
+        const message =
+          `*ملخص وردية الجودة - ${settings.factoryName}*\n` +
+          `التاريخ: ${todayStr}\n` +
+          `الوردية: ${selectedShift}\n` +
+          `إجمالي الفحوصات: ${shiftLogs.length}\n` +
+          `المرفوض: ${rejected}\n` +
+          `الحالات المفتوحة: ${openCases}\n` +
+          `أكثر العيوب: ${defects}`;
+        window.open(
+          `https://wa.me/${settings.managerPhone}?text=${encodeURIComponent(message)}`,
+          "_blank",
+        );
+        showToast("تم تجهيز ملخص الوردية في واتساب.");
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function buildShiftReport(shiftLogs, date, selectedShift) {
+        const passed = shiftLogs.filter((log) => log.status === "مقبول").length;
+        const rejected = shiftLogs.filter(
+          (log) => log.status === "مرفوض",
+        ).length;
+        const conditional = shiftLogs.filter(
+          (log) => log.status === "مقبول بشرط",
+        ).length;
+        const openCases = shiftLogs.filter(
+          (log) =>
+            (log.followUpStatus || "مفتوح") !== "تم الحل" &&
+            (log.followUpStatus || "مفتوح") !== "غير مطلوب",
+        ).length;
+        const defectCounts = {};
+        shiftLogs.forEach((log) => {
+          if (log.type !== "لا يوجد عيوب") {
+            defectCounts[log.type] = (defectCounts[log.type] || 0) + 1;
+          }
+        });
+        const topDefects =
+          Object.entries(defectCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([type, count]) => `${escapeHtml(type)} (${count})`)
+            .join("، ") || "لا توجد عيوب مسجلة";
+        const rate = shiftLogs.length
+          ? ((rejected / shiftLogs.length) * 100).toFixed(1)
+          : "0.0";
+        const rows = shiftLogs
+          .slice()
+          .sort((a, b) => (a.id || 0) - (b.id || 0))
+          .map((log) => {
+            const images = log.images || (log.image ? [log.image] : []);
+            const imageMarkup = images.length
+              ? images
+                  .map(
+                    (image) =>
+                      `<img src="${image}" alt="صورة عيب جودة في فحص ${escapeHtml(log.inspectionNo || log.id)}" />`,
+                  )
+                  .join("")
+              : "لا توجد صورة";
+            return `<tr>
+              <td>${escapeHtml(log.inspectionNo || log.id)}<br>${escapeHtml(log.date)}<br>${escapeHtml(log.shift)}<br>${escapeHtml(formatInspectionTime(log.checkedAt || log.createdAt))}</td>
+              <td><strong>${escapeHtml(log.machine)}</strong><br>${escapeHtml(log.product)}<br>Cavity: ${escapeHtml(log.cavity || "الكل")}</td>
+              <td>${escapeHtml(log.material)}<br>الوزن: ${escapeHtml(log.weight ? `${log.weight} ${log.weightUnit || "جرام"}` : "غير مسجل")}<br>الفني: ${escapeHtml(log.techName || "غير محدد")}<br>المفتش: ${escapeHtml(log.inspectorName || "غير محدد")}</td>
+              <td><strong>${escapeHtml(log.status)}</strong><br>الخطورة: ${escapeHtml(log.severity)}<br>المتابعة: ${escapeHtml(log.followUpStatus || "مفتوح")}</td>
+              <td>${escapeHtml(log.type)}<br>إبلاغ الفني: ${escapeHtml(log.techAck || "غير محدد")}</td>
+              <td>${imageMarkup}</td>
+              <td>${escapeHtml(log.action || "مطابق للمواصفات")}</td>
+            </tr>`;
+          })
+          .join("");
+
+        const report = document.createElement("div");
+        report.className = "shift-report";
+        report.innerHTML = `<div class="shift-report-header">
+          <h1>${escapeHtml(settings.factoryName)} | تقرير تفتيش ومراقبة الجودة</h1>
+          <p>تقرير كامل للوردية ${escapeHtml(selectedShift)} بتاريخ ${escapeHtml(date)}</p>
+          <p>تم إعداد التقرير: ${escapeHtml(new Date().toLocaleString("ar-EG"))}</p>
+        </div>
+        <div class="shift-report-summary">
+          <div><strong>إجمالي الفحوصات</strong><span>${shiftLogs.length}</span></div>
+          <div><strong>مقبول</strong><span>${passed}</span></div>
+          <div><strong>مرفوض</strong><span>${rejected}</span></div>
+          <div><strong>مقبول بشرط</strong><span>${conditional}</span></div>
+          <div><strong>معدل الرفض</strong><span>${rate}%</span></div>
+          <div><strong>حالات مفتوحة</strong><span>${openCases}</span></div>
+          <div><strong>أكثر العيوب</strong><span>${topDefects}</span></div>
+        </div>
+        <h2>تفاصيل فحوصات الوردية</h2>
+        <table>
+          <thead><tr><th>رقم الفحص / الوقت</th><th>الماكينة / المنتج</th><th>الخامة / الوزن / الفريق</th><th>القرار / المتابعة</th><th>العيب / البلاغ</th><th>الصور</th><th>الإجراء والملاحظات</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="shift-report-footer">هذا التقرير صادر من منظومة Pack to Pack لتوثيق فحوصات الجودة ومتابعة الإجراءات.</div>`;
+        return report;
+      }
+
+      async function sendShiftPdfToManager() {
+        const date = getLocalDate();
+        const selectedShift = document.getElementById("shift").value;
+        const shiftLogs = allLogs.filter(
+          (log) => log.date === date && log.shift === selectedShift,
+        );
+        if (!shiftLogs.length) {
+          alert(`لا توجد فحوصات مسجلة للوردية ${selectedShift} اليوم.`);
+          return;
+        }
+        if (typeof html2pdf !== "function") {
+          alert("تعذر إنشاء PDF. تأكد من اتصال الإنترنت ثم حاول مرة أخرى.");
+          return;
+        }
+
+        const report = buildShiftReport(shiftLogs, date, selectedShift);
+        document.body.appendChild(report);
+        const filename = `تقرير_جودة_${date}_${selectedShift}.pdf`;
+        const pdfOptions = {
+          margin: [0.25, 0.25, 0.25, 0.25],
+          filename,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
+          jsPDF: { unit: "in", format: "a4", orientation: "landscape" },
+          pagebreak: { mode: ["css", "legacy"] },
+        };
+
+        try {
+          const pdfBlob = await html2pdf()
+            .set(pdfOptions)
+            .from(report)
+            .outputPdf("blob");
+          const pdfFile = new File([pdfBlob], filename, {
+            type: "application/pdf",
+          });
+          const shareText = `تقرير جودة كامل للوردية ${selectedShift} بتاريخ ${date} - ${settings.factoryName}`;
+          if (navigator.share && navigator.canShare?.({ files: [pdfFile] })) {
+            await navigator.share({
+              title: "تقرير جودة كامل",
+              text: shareText,
+              files: [pdfFile],
+            });
+            showToast("تم فتح مشاركة التقرير. اختر واتساب ثم المدير.");
+          } else {
+            const downloadUrl = URL.createObjectURL(pdfBlob);
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(downloadUrl);
+            window.open(
+              `https://wa.me/${settings.managerPhone}?text=${encodeURIComponent(shareText + "\nتم تنزيل ملف PDF وإرفاقه في المحادثة.")}`,
+              "_blank",
+            );
+            showToast("تم تنزيل PDF وفتح واتساب لإرفاقه للمدير.");
+          }
+        } catch (error) {
+          if (error.name !== "AbortError") {
+            alert("تعذر إنشاء أو مشاركة تقرير PDF. حاول مرة أخرى.");
+          }
+        } finally {
+          report.remove();
+        }
+      }
+
+      async function sendToManagerWhatsApp() {
+        const todayStr = getLocalDate();
+        const todayLogs = allLogs.filter((log) => log.date === todayStr);
+
+        if (!todayLogs.length) {
+          alert("لا توجد فحوصات مسجلة لليوم لإرسالها.");
+          return;
+        }
+
+        const previousTab = currentTab;
+        if (currentTab !== "today") {
+          currentTab = "today";
+          renderView();
+        }
+        updatePdfSummary(todayLogs);
+
+        const formCard = document.querySelector(".form-card");
+        document.body.classList.add("pdf-export");
+        if (formCard) formCard.style.display = "none";
+        document
+          .querySelectorAll(".no-print")
+          .forEach((el) => (el.style.display = "none"));
+
+        const statusCanvas = document.getElementById("statusChart");
+        const defectsCanvas = document.getElementById("defectsChart");
+
+        const statusImg = document.createElement("img");
+        statusImg.src = statusCanvas.toDataURL("image/png");
+        statusImg.alt = "مخطط قرارات الفحص";
+        statusImg.style.maxWidth = "100%";
+
+        const defectsImg = document.createElement("img");
+        defectsImg.src = defectsCanvas.toDataURL("image/png");
+        defectsImg.alt = "مخطط عيوب الجودة";
+        defectsImg.style.maxWidth = "100%";
+
+        const statusParent = statusCanvas.parentNode;
+        const defectsParent = defectsCanvas.parentNode;
+
+        statusParent.replaceChild(statusImg, statusCanvas);
+        defectsParent.replaceChild(defectsImg, defectsCanvas);
+
+        const element = document.getElementById("reportArea");
+        const reportWidth = Math.ceil(element.scrollWidth);
+        const filename = `تقرير_تفتيش_الجودة_${todayStr}.pdf`;
+        const opt = {
+          margin: [0.2, 0.2, 0.2, 0.2],
+          filename,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            width: reportWidth,
+            windowWidth: reportWidth,
+            x: 0,
+            y: 0,
+            scrollX: 0,
+            scrollY: 0,
+          },
+          jsPDF: { unit: "in", format: "a4", orientation: "landscape" },
+          pagebreak: { mode: ["css", "legacy"] },
+        };
+
+        try {
+          await html2pdf().set(opt).from(element).save();
+        } finally {
+          if (formCard) formCard.style.display = "block";
+          statusParent.replaceChild(statusCanvas, statusImg);
+          defectsParent.replaceChild(defectsCanvas, defectsImg);
+          document
+            .querySelectorAll(".no-print")
+            .forEach((el) => (el.style.display = ""));
+          document.body.classList.remove("pdf-export");
+          if (previousTab !== "today") {
+            currentTab = previousTab;
+            renderView();
+          }
+        }
+
+        const total = document.getElementById("total-inspections").innerText;
+        const pass = document.getElementById("passed-count").innerText;
+        const reject = document.getElementById("rejected-count").innerText;
+        const rate = document.getElementById("defect-rate").innerText;
+
+        const importantLogs = todayLogs.filter(
+          (log) => log.status !== "مقبول" || log.severity.includes("حرج"),
+        );
+        const machineCounts = {};
+        importantLogs.forEach((log) => {
+          machineCounts[log.machine] = (machineCounts[log.machine] || 0) + 1;
+        });
+        const affectedMachines =
+          Object.entries(machineCounts)
+            .map(([machine, count]) => `${machine} (${count})`)
+            .join("، ") || "لا يوجد";
+
+        const openFollowUps = todayLogs.filter(
+          (log) =>
+            (log.followUpStatus || "مفتوح") !== "تم الحل" &&
+            log.status !== "مقبول",
+        ).length;
+        const shiftCounts = {};
+        const defectCounts = {};
+        todayLogs.forEach((log) => {
+          shiftCounts[log.shift] = (shiftCounts[log.shift] || 0) + 1;
+          if (log.type !== "لا يوجد عيوب") {
+            defectCounts[log.type] = (defectCounts[log.type] || 0) + 1;
+          }
+        });
+        const shiftSummary =
+          Object.entries(shiftCounts)
+            .map(([shift, count]) => `${shift}: ${count}`)
+            .join("، ") || "لا يوجد";
+        const defectSummary =
+          Object.entries(defectCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([defect, count]) => `${defect} (${count})`)
+            .join("، ") || "لا توجد عيوب مسجلة";
+        let message = `*تحديث جودة - ${settings.factoryName}*\n`;
+        message += `التاريخ: ${new Date().toLocaleDateString("ar-EG")}\n`;
+        message += `إجمالي الفحوصات: ${total} | المقبول: ${pass} | المرفوض: ${reject}\n`;
+        message += `*معدل الرفض العام:* ${rate}\n`;
+        message += `توزيع الورديات: ${shiftSummary}\n`;
+        message += `أكثر العيوب تكرارًا: ${defectSummary}\n`;
+        message += `الماكينات المتأثرة: ${affectedMachines}\n`;
+        message += `الحالات المفتوحة: ${openFollowUps}\n`;
+        message += `\n*الحالات التي تحتاج متابعة:*\n`;
+
+        if (!importantLogs.length) {
+          message += "لا توجد حالات مرفوضة أو حرجة اليوم.\n";
+        } else {
+          importantLogs
+            .sort((a, b) => a.id - b.id)
+            .forEach((log, index) => {
+              message += `\n${index + 1}. *${log.machine} - ${log.product}*\n`;
+              message += `القرار: *${log.status}* | الخطورة: ${log.severity}\n`;
+              message += `العيب: ${log.type} | الوردية: ${log.shift}\n`;
+              message += `رقم الفحص: ${log.inspectionNo || log.id} | المتابعة: ${log.followUpStatus || "مفتوح"}\n`;
+              if (log.weight) {
+                message += `الوزن: ${log.weight} ${log.weightUnit || "جرام"}\n`;
+              }
+              message += `الفني: ${log.techName || "غير محدد"} | حالة البلاغ: ${log.techAck || "غير محدد"}\n`;
+              message += `الإجراء: ${log.action}\n`;
+            });
+        }
+
+        if (importantLogs.some((log) => log.techAck.includes("رفض"))) {
+          message += "\n⚠️ يوجد فني رفض التوقف أو التعديل ويحتاج تدخلًا.\n";
+        }
+
+        message += `\nتم إعداد تقرير ${settings.factoryName} للتوثيق الكامل.`;
+
+        const whatsappUrl = `https://wa.me/${settings.managerPhone}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, "_blank");
+      }
+
+      function exportToCSV() {
+        if (!allLogs.length) return alert("لا توجد بيانات للتصدير");
+        let csv =
+          "\uFEFFرقم الفحص,التاريخ,وقت الفحص,الوردية,المفتش,الماكينة,المنتج,الخامة,الوزن,الفني,القرار,الخطورة,Cavity,نوع العيب,تنبيه الفني,حالة المتابعة,الإجراء والملاحظات\n";
+        allLogs.forEach((log) => {
+          csv +=
+            [
+              log.inspectionNo || log.id,
+              log.date,
+              formatInspectionTime(log.checkedAt || log.createdAt),
+              log.shift,
+              log.inspectorName || "غير محدد",
+              log.machine,
+              log.product,
+              log.material,
+              log.weight ? `${log.weight} ${log.weightUnit || "جرام"}` : "",
+              log.techName,
+              log.status,
+              log.severity,
+              log.cavity,
+              log.type,
+              log.techAck,
+              log.followUpStatus || "مفتوح",
+              log.action,
+            ]
+              .map(csvEscape)
+              .join(",") + "\n";
+        });
+        const link = document.createElement("a");
+        link.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+        link.download = `أرشيف_فحص_الجودة_${getLocalDate()}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+
+      function csvEscape(value) {
+        const text = String(value ?? "");
+        return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+      }
+
+      function exportBackup() {
+        const backup = {
+          version: 2,
+          exportedAt: new Date().toISOString(),
+          logs: allLogs,
+          settings,
+        };
+        const dataStr =
+          "data:text/json;charset=utf-8," +
+          encodeURIComponent(JSON.stringify(backup));
+        const downloadAnchor = document.createElement("a");
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute(
+          "download",
+          `QMS_Backup_${getLocalDate()}.json`,
+        );
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+      }
+
+      function importBackup() {
+        document.getElementById("backupInput").click();
+      }
+
+      function processBackup(input) {
+        const file = input.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            try {
+              const importedData = JSON.parse(e.target.result);
+              const importedLogs = Array.isArray(importedData)
+                ? importedData
+                : importedData?.logs;
+              if (Array.isArray(importedLogs)) {
+                if (
+                  allLogs.length &&
+                  !confirm(
+                    "استرجاع النسخة سيستبدل السجلات الحالية. هل تريد المتابعة؟",
+                  )
+                ) {
+                  input.value = "";
+                  return;
+                }
+                allLogs = importedLogs;
+                if (importedData.settings) {
+                  settings.factoryName =
+                    importedData.settings.factoryName || settings.factoryName;
+                  settings.managerPhone =
+                    importedData.settings.managerPhone || settings.managerPhone;
+                  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+                  document.querySelector(".factory-name").textContent =
+                    settings.factoryName;
+                  document.querySelector(".report-heading strong").textContent =
+                    settings.factoryName;
+                }
+                saveLogs();
+                renderView();
+                showToast("تم استرجاع النسخة الاحتياطية بنجاح.");
+                input.value = "";
+              } else {
+                alert("ملف غير صالح!");
+              }
+            } catch (err) {
+              alert("ملف غير صالح!");
+            }
+          };
+          reader.readAsText(file);
+        }
+      }
+    </script>
+  </body>
+</html>

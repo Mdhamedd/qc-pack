@@ -1,0 +1,21 @@
+{
+  "name": "Pack to Pack | نظام التفتيش ومراقبة الجودة",
+  "short_name": "Pack to Pack",
+  "description": "تسجيل فحوصات الجودة ومتابعة العيوب والإجراءات",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eef2f3",
+  "theme_color": "#23486b",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
